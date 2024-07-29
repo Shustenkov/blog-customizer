@@ -7,7 +7,7 @@ import { Separator } from '../separator';
 
 import styles from './ArticleParamsForm.module.scss';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import clsx from 'clsx';
 import {
 	ArticleStateType,
@@ -18,6 +18,7 @@ import {
 	fontSizeOptions,
 	OptionType,
 } from 'src/constants/articleProps';
+import { useClose } from './hooks/useClose';
 
 type ArticleParamsFormProps = {
 	initialFormState: ArticleStateType;
@@ -27,28 +28,20 @@ type ArticleParamsFormProps = {
 export const ArticleParamsForm = (props: ArticleParamsFormProps) => {
 	const { initialFormState, applyChangesCallback } = props;
 
-	const [isOpen, setIsOpen] = useState<boolean>(false);
+	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 	const [formState, setFormState] = useState<ArticleStateType>(initialFormState);
 
 	const rootRef = useRef<HTMLElement | null>(null);
 
-	useEffect(() => {
-		const handleClick = (e: MouseEvent) => {
-			const { target } = e;
-			if (
-				target instanceof Node &&
-				document.contains(target) &&
-				!rootRef.current?.contains(target)
-			) {
-				isOpen && setIsOpen(false);
-			}
-		};
-		window.addEventListener('click', handleClick);
+	const closeMenu = () => {
+		setIsMenuOpen(false);
+	}
 
-		return () => {
-			window.removeEventListener('click', handleClick);
-		};
-	}, [isOpen]);
+	useClose({
+		isOpen: isMenuOpen,
+		onClose: closeMenu,
+		rootRef: rootRef,
+	});
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -64,7 +57,7 @@ export const ArticleParamsForm = (props: ArticleParamsFormProps) => {
 		e: React.MouseEvent<HTMLDivElement, MouseEvent>
 	) => {
 		e.stopPropagation();
-		setIsOpen(!isOpen);
+		setIsMenuOpen(!isMenuOpen);
 	};
 
 	const changeFormState = <T extends ArticleStateType, K extends keyof T>(
@@ -99,10 +92,10 @@ export const ArticleParamsForm = (props: ArticleParamsFormProps) => {
 
 	return (
 		<>
-			<ArrowButton onClick={openButtonClickHandler} isOpen={isOpen} />
+			<ArrowButton onClick={openButtonClickHandler} isOpen={isMenuOpen} />
 			<aside
 				ref={rootRef}
-				className={clsx(styles.container, isOpen && styles.container_open)}>
+				className={clsx(styles.container, {[styles.container_open]: isMenuOpen})}>
 				<form
 					className={styles.form}
 					onSubmit={handleSubmit}
