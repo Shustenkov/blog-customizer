@@ -40,11 +40,11 @@
 
 .label:hover,
 .item[data-checked='true'] .label:hover {
-	background: var(--gold, #ffc802);
+	background: var(--app-color-honey, #ffedab);
 }
 
 .item[data-checked='true'] .label {
-	background: var(--gold, #ffc802);
+	background: var(--app-color-gold, #ffc802);
 }
 
 .container {
